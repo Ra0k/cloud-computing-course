@@ -33,7 +33,6 @@ app.get('/', function homepage(req, res) {
  */
 
 app.get('/api', (req, res) => {
-  // TODO: Document all your api endpoints below as a simple hardcoded JSON object.
   res.json({
     message: 'Welcome to my app api!',
     documentationUrl: '', //leave this also blank for the first exercise
@@ -42,22 +41,24 @@ app.get('/api', (req, res) => {
       {method: 'GET', path: '/api', description: 'Describes all available endpoints'},
       {method: 'GET', path: '/api/profile', description: 'Data about me'},
       {method: 'GET', path: '/api/books/', description: 'Get All books information'},
-      // TODO: Write other API end-points description here like above
+      {method: 'POST', path: '/api/books/', description: 'Add a book information into database'},
+      {method: 'PUT', path: '/api/books/:id', description: 'Update a book information based upon the specified ID'},
+      {method: 'DELETE', path: '/api/books/:id', description: 'Delete a book based upon the specified ID'},
     ]
   })
 });
-// TODO:  Fill the values
 app.get('/api/profile', (req, res) => {
   res.json({
-    'name': '',
-    'homeCountry': '',
-    'degreeProgram': '',//informatics or CSE.. etc
-    'email': '',
-    'deployedURLLink': '',//leave this blank for the first exercise
-    'apiDocumentationURL': '', //leave this also blank for the first exercise
-    'currentCity': '',
-    'hobbies': []
-
+    'name': 'David Szabo',
+    'homeCountry': 'Hungary',
+    'degreeProgram': 'Data Engineering and Analytics (M.Sc.)',
+    'email': 'david.szabo@tum.de',
+    'deployedURLLink': '',
+    'apiDocumentationURL': '',
+    'currentCity': 'München',
+    'hobbies': [
+      'programming'
+    ]
   })
 });
 /*
@@ -78,59 +79,32 @@ app.get('/api/books/', (req, res) => {
 /*
  * Add a book information into database
  */
-app.post('/api/books/', (req, res) => {
-
-  /*
-   * New Book information in req.body
-   */
-  console.log(req.body);
-  /*
-   * TODO: use the books model and create a new object
-   * with the information in req.body
-   */
-  /*
-   * return the new book information object as json
-   */
-  var newBook = {};
+app.post('/api/books/', async (req, res) => {
+  const newBook = await db.books.create(req.body);
   res.json(newBook);
 });
 
 /*
  * Update a book information based upon the specified ID
  */
-app.put('/api/books/:id', (req, res) => {
-  /*
-   * Get the book ID and new information of book from the request parameters
-   */
+app.put('/api/books/:id', async (req, res) => {
   const bookId = req.params.id;
   const bookNewData = req.body;
-  console.log(`book ID = ${bookId} \n Book Data = ${bookNewData}`);
 
-  /*
-   * TODO: use the books model and find using the bookId and update the book information
-   */
-  /*
-   * Send the updated book information as a JSON object
-   */
-  var updatedBookInfo = {};
+  const filter = {_id: bookId}
+  let updatedBookInfo = await db.books.findOneAndUpdate(filter, bookNewData, {new:true});
+  
   res.json(updatedBookInfo);
 });
 /*
  * Delete a book based upon the specified ID
  */
-app.delete('/api/books/:id', (req, res) => {
-  /*
-   * Get the book ID of book from the request parameters
-   */
+app.delete('/api/books/:id', async (req, res) => {
   const bookId = req.params.id;
-  /*
-   * TODO: use the books model and find using
-   * the bookId and delete the book
-   */
-  /*
-   * Send the deleted book information as a JSON object
-   */
-  var deletedBook = {};
+  
+  const filter = {_id: bookId}
+  let deletedBook = await db.books.findByIdAndDelete(filter);
+
   res.json(deletedBook);
 });
 
