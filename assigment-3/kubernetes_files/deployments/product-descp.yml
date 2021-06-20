@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-descp-service-deployment
+  labels:
+    app: product-descp-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product-descp-service
+  template:
+    metadata:
+      labels:
+        app: product-descp-service
+    spec:
+      containers:
+        - name: product-descp-service
+          image: ra0k/microservice:productdescp
+          ports:
+            - containerPort: 9002
